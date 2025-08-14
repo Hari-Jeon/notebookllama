@@ -1,3 +1,4 @@
+import logging
 import uuid
 import os
 import warnings
@@ -9,7 +10,9 @@ from typing import List, Union
 from pyvis.network import Network
 from llama_index.core.llms import ChatMessage
 from llama_index.llms.openai import OpenAIResponses
+from llama_index.llms.ollama import Ollama
 
+logger = logging.getLogger(__name__)
 
 class Node(BaseModel):
     id: str
@@ -68,9 +71,22 @@ class MindMapCreationFailedWarning(Warning):
     """A warning returned if the mind map creation failed"""
 
 
+LLM = None
+LLM_STRUCT = None
 if os.getenv("OPENAI_API_KEY", None):
-    LLM = OpenAIResponses(model="gpt-4.1", api_key=os.getenv("OPENAI_API_KEY"))
+    LLM = OpenAIResponses(
+        model=os.getenv("OPENAI_API_MODEL", "gpt-4.1"),
+        api_key=os.getenv("OPENAI_API_KEY")
+    )
+elif os.getenv("OLLAMA_BASE_URL", None):
+    LLM = Ollama(
+        model=os.getenv("OLLAMA_MODEL", "llama2"),
+        base_url=os.getenv("OLLAMA_BASE_URL")
+    )
+if LLM:
     LLM_STRUCT = LLM.as_structured_llm(MindMap)
+else:
+    logger.warning("Missing LLM - MindMap generator not initialized")
 
 
 async def get_mind_map(summary: str, highlights: List[str]) -> Union[str, None]:

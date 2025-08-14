@@ -1,13 +1,16 @@
 from dotenv import load_dotenv
+import logging
 import json
 import os
 
 from pydantic import BaseModel, Field, model_validator
 from llama_index.core.llms import ChatMessage
 from llama_index.llms.openai import OpenAIResponses
+from llama_index.llms.ollama import Ollama
 from typing import List, Tuple, Optional
 from typing_extensions import Self
 
+logger = logging.getLogger(__name__)
 load_dotenv()
 
 
@@ -29,9 +32,22 @@ class ClaimVerification(BaseModel):
         return self
 
 
+LLM = None
+LLM_VERIFIER = None
 if os.getenv("OPENAI_API_KEY", None):
-    LLM = OpenAIResponses(model="gpt-4.1", api_key=os.getenv("OPENAI_API_KEY"))
+    LLM = OpenAIResponses(
+        model=os.getenv("OPENAI_API_MODEL", "gpt-4.1"),
+        api_key=os.getenv("OPENAI_API_KEY")
+    )
+elif os.getenv("OLLAMA_BASE_URL", None):
+    LLM = Ollama(
+        model=os.getenv("OLLAMA_MODEL", "llama2"),
+        base_url=os.getenv("OLLAMA_BASE_URL")
+    )
+if LLM:
     LLM_VERIFIER = LLM.as_structured_llm(ClaimVerification)
+else:
+    logger.warning("Missing LLM - Verifier not initialized")
 
 
 def verify_claim(

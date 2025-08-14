@@ -22,7 +22,10 @@ skip_condition = not (
     os.getenv("LLAMACLOUD_API_KEY", None)
     and os.getenv("EXTRACT_AGENT_ID", None)
     and os.getenv("LLAMACLOUD_PIPELINE_ID", None)
-    and os.getenv("OPENAI_API_KEY", None)
+    and (
+        os.getenv("OPENAI_API_KEY", None)
+        or os.getenv("OLLAMA_BASE_URL", None)
+    )
 )
 
 
