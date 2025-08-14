@@ -65,6 +65,15 @@ Next, open the `.env` file and add your API keys:
 - `ELEVENLABS_API_KEY`: find it [on ElevenLabs Settings](https://elevenlabs.io/app/settings/api-keys)
 - `LLAMACLOUD_API_KEY`: find it [on LlamaCloud Dashboard](https://cloud.llamaindex.ai?utm_source=demo&utm_medium=notebookLM)
 
+To use Ollama instead of the OpenAI API, add your base URL:
+
+- `OLLAMA_BASE_URL`: by default is "http://localhost:11434"
+
+Optionally, you can also add the model:
+
+- `OPENAI_API_MODEL`: by default is "gpt-4.1"
+- `OLLAMA_MODEL`: by default is "llama2"
+
 **4. Activate the Virtual Environment**
 
 (on mac/unix)
